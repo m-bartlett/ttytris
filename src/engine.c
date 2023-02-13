@@ -188,6 +188,7 @@ void engine_swap_hold(void)
 void engine_place_tetromino_at_xy(uint8_t x, uint8_t y)
 { //{{{
     playfield_place_tetromino(&tetromino, x, y);
+    draw_playfield();
     tetromino_swapped = false;
     tetromino = (tetromino_t){ (tetromino_type_t)(bag_of_7_pop_sample()+1), 0 };
     X = PLAYFIELD_SPAWN_X;
@@ -205,7 +206,6 @@ void engine_place_tetromino_at_xy(uint8_t x, uint8_t y)
         }
     }
     draw_score();
-    draw_playfield();
     draw_queue_preview();
 /*}}}*/}
 
