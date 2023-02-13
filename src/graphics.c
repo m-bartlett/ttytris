@@ -139,7 +139,7 @@ void draw_active_tetromino(void)
 
 void draw_hard_drop_preview(void)
 { //{{{
-    int8_t Y_harddrop = engine_get_hard_drop_y();
+    int8_t Y_harddrop = engine_update_hard_drop_y();
     if (Y_harddrop > -1) {
         const point_t p = engine_get_active_xy();
         const tetromino_t* tetromino = engine_get_active_tetromino();
@@ -183,7 +183,8 @@ void graphics_init(void)
     cbreak();  /* character input accepted immediatley */
     noecho();  /* don't print input characters */
     curs_set(0);
-    keypad(stdscr, TRUE);   
+    keypad(stdscr, TRUE);
+
 
     /* Initialize ncurses colors */
     start_color();

@@ -29,7 +29,7 @@ typedef struct { tetromino_type_t type; uint8_t rotation; } tetromino_t;
 const char tetromino_type_t2char(const tetromino_type_t t);
 const char tetromino_get_type_char(const tetromino_t *t);
 const uint16_t tetromino_get_grid(const tetromino_t *t);
-const uint16_t tetromino_rotate_clockwise(tetromino_t *t);
-const uint16_t tetromino_rotate_counterclockwise(tetromino_t *t);
+void tetromino_rotate_clockwise(tetromino_t *t);
+void tetromino_rotate_counterclockwise(tetromino_t *t);
 
 #endif

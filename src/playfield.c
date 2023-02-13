@@ -37,7 +37,7 @@ uint16_t playfield_get_4x4_vacancy_at_coordinate(uint8_t X, uint8_t Y)
         }
     }
     return grid;
-/*}}}*/} 
+/*}}}*/}
 
 
 bool playfield_validate_tetromino_placement(tetromino_t* t, uint8_t X, uint8_t Y)

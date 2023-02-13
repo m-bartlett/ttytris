@@ -23,7 +23,7 @@ TETROMINO_TYPE_T2CHAR[TETROMINO_TYPE_QUANTITY] = { [TETROMINO_TYPE_NULL] = '\0',
 static const uint16_t
 TETROMINO_ROTATIONS[TETROMINO_TYPE_QUANTITY][4] = {
   [TETROMINO_TYPE_NULL] = {0,0,0,0},
-  
+                                    // rotation =  0    90   180   270 
   [TETROMINO_TYPE_I] = BITGRID_4x4x4_TO_UINT16x4(0000, 0010, 0000, 0100,
                                                  1111, 0010, 0000, 0100,
                                                  0000, 0010, 1111, 0100,
@@ -85,15 +85,13 @@ const uint16_t tetromino_get_grid(const tetromino_t *t)
 }
 
 
-const uint16_t tetromino_rotate_clockwise(tetromino_t *t)
+void tetromino_rotate_clockwise(tetromino_t *t)
 {
     t->rotation = (t->rotation+1) & 0b11;  // n&3 == n%3
-    return tetromino_get_grid(t);
 }
 
 
-const uint16_t tetromino_rotate_counterclockwise(tetromino_t *t)
+void tetromino_rotate_counterclockwise(tetromino_t *t)
 {
     t->rotation = (t->rotation-1) & 0b11;  // n&3 == n%3
-    return tetromino_get_grid(t);
 }
