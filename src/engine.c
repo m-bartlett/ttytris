@@ -16,6 +16,7 @@ static bool tetromino_swapped = false;
 static uint32_t fall_delay = 999999;
 static pthread_mutex_t mutex;
 static pthread_t engine_timer_thread;
+static bool game_loop = 1;
 
 
 void engine_input_loop(void)
@@ -49,7 +50,7 @@ void engine_input_loop(void)
 
 static void *engine_timer_thread_task(void*)
 { //{{{
-    while(1) {
+    while(game_loop) {
         usleep(fall_delay);
         pthread_mutex_lock(&mutex);
         engine_move_active_tetromino(0, 1);
@@ -67,13 +68,17 @@ void engine_init()
     X = PLAYFIELD_SPAWN_X, Y = PLAYFIELD_SPAWN_Y;
     tetromino = (tetromino_t){ (tetromino_type_t)(bag_of_7_pop_sample()+1), 0 };
     pthread_create(&engine_timer_thread, NULL, &engine_timer_thread_task, NULL);
+    game_loop = 1;
 /*}}}*/ }
 
 
 void engine_clean()
 { //{{{
-    pthread_join(engine_timer_thread, NULL);
+    game_loop = 0;
+    pthread_cancel(engine_timer_thread);
+    pthread_mutex_unlock(&mutex);
     pthread_mutex_destroy(&mutex);
+    pthread_join(engine_timer_thread, NULL);
 /*}}}*/ }
 
 
