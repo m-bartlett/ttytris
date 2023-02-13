@@ -23,6 +23,7 @@ void draw_tetromino_at_xy_noclip(WINDOW *w,
 
 void draw_playfield(void);
 void draw_queue_preview(void);
+void draw_score(void);
 void draw_held_tetromino(void);
 void draw_screen(void);
 void draw_active_tetromino(void);

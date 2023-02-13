@@ -21,7 +21,7 @@ uint16_t playfield_get_4x4_vacancy_at_coordinate(uint8_t X, uint8_t Y);
 void playfield_place_tetromino(tetromino_t* t, uint8_t X, uint8_t Y);
 bool playfield_validate_tetromino_placement(tetromino_t* t, uint8_t X, uint8_t Y);
 void playfield_clear_line(uint8_t Y);
-void playfield_clear_lines(void (*callback)(uint8_t));
+uint8_t playfield_clear_lines(void (*callback)(uint8_t));
 
 
 #endif

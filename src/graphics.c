@@ -10,6 +10,7 @@ static WINDOW *root_window;
 static WINDOW *playfield_window;
 static WINDOW *preview_window;
 static WINDOW *hold_window;
+static WINDOW *score_window;
 
 #define ANSI_BLACK   0
 #define ANSI_RED     1
@@ -88,7 +89,6 @@ void draw_playfield(void)
             wattroff(playfield_window, COLOR_PAIR(color));
         }
     }
-    wrefresh(playfield_window); // TO-DO: needed?
 /*}}}*/ }
 
 
@@ -148,6 +148,15 @@ void draw_hard_drop_preview(void)
 /*}}}*/ }
 
 
+void draw_score(void)
+{ //{{{
+    wclear(score_window);
+    mvwaddstr(score_window, 0, 0, "LEVEL");
+    mvwprintw(score_window, 1, 2, "% 2d", engine_get_level()+1);
+    wrefresh(score_window);
+/*}}}*/ }
+
+
 void draw_game(void)
 { //{{{
     draw_playfield();
@@ -155,7 +164,6 @@ void draw_game(void)
     draw_active_tetromino();
     wrefresh(playfield_window);
 /*}}}*/ }
-
 
 
 void animate_line_kill(uint8_t Y)
@@ -202,6 +210,7 @@ void graphics_init(void)
     playfield_window = derwin(root_window, PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH, 1, 1);
     preview_window = newwin(TETROMINO_QUEUE_PREVIEW_HEIGHT+1,6,Y_offset,X_offset+PLAYFIELD_WIDTH+2);
     hold_window = newwin(5, 6, Y_offset, X_offset-(PLAYFIELD_WIDTH/2)-1);
+    score_window = newwin(10, 6, Y_offset+6, X_offset-(PLAYFIELD_WIDTH/2)-1);
 
     /* Must refresh root window before drawing to subwindows */
     refresh();
@@ -209,6 +218,8 @@ void graphics_init(void)
     wrefresh(root_window);
     draw_queue_preview();
     draw_held_tetromino();
+    draw_score();
+    wrefresh(playfield_window);
 /*}}}*/ }
 
 

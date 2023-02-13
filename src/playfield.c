@@ -85,8 +85,9 @@ void playfield_clear_line(uint8_t Y)
 /*}}}*/ }
 
 
-void playfield_clear_lines(void (*callback)(uint8_t))
+uint8_t playfield_clear_lines(void (*callback)(uint8_t))
 { //{{{
+    uint8_t lines = 0;
     for (uint8_t y = 0; y < PLAYFIELD_HEIGHT; ++y) {
         bool row_occupied = true;
         for (uint8_t x = 0; x < PLAYFIELD_WIDTH; ++x) {
@@ -95,6 +96,8 @@ void playfield_clear_lines(void (*callback)(uint8_t))
         if (row_occupied) {
             if (callback != NULL) callback(y);
             playfield_clear_line(y);
+            ++lines;
         }
     }
+    return lines;
 /*}}}*/ }
