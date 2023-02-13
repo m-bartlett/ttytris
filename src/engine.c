@@ -32,10 +32,11 @@ void engine_input_loop(void)
             case KEY_LEFT:  engine_move_active_tetromino(-1,0); break;
             case KEY_RIGHT: engine_move_active_tetromino(1,0);  break;
             case KEY_DOWN:  engine_move_active_tetromino(0,1);  break;
-            case KEY_UP:    engine_place_tetromino_at_xy(X, Y_hard_drop); break;
+            case KEY_UP:
+                engine_place_tetromino_at_xy(X, Y_hard_drop);
+                break;
             case 's': engine_rotate_active_tetromino_counterclockwise();  break;
             case 'd': engine_rotate_active_tetromino_clockwise();  break;
-            case ' ': engine_place_tetromino_at_xy(X, Y); break;
             case 'r': engine_swap_hold(); break;
             case 'q': return;
             default:;
@@ -53,7 +54,9 @@ static void *engine_timer_thread_task(void*)
     while(game_loop) {
         usleep(fall_delay);
         pthread_mutex_lock(&mutex);
-        engine_move_active_tetromino(0, 1);
+        if (!engine_move_active_tetromino(0, 1)) {
+            engine_place_tetromino_at_xy(X,Y);
+        }
         draw_game();
         pthread_mutex_unlock(&mutex);
     };
@@ -111,13 +114,15 @@ const int8_t engine_update_hard_drop_y()
 /*}}}*/ }
 
 
-void engine_move_active_tetromino(int8_t dx, uint8_t dy)
+bool engine_move_active_tetromino(int8_t dx, uint8_t dy)
 { //{{{
     uint8_t _X=X+dx, _Y=Y+dy;
     if (playfield_validate_tetromino_placement(&tetromino, _X, _Y)) {
         X=_X;
         Y=_Y;
+        return true;
     }
+    return false;
 /*}}}*/ }
 
 
