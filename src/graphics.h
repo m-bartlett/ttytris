@@ -30,5 +30,6 @@ void draw_active_tetromino(void);
 void draw_hard_drop_preview(void);
 void draw_game(void);
 void animate_line_kill(uint8_t Y);
+void draw_debug(const char* msg);
 
 #endif

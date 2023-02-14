@@ -4,6 +4,7 @@
 #include "playfield.h"
 #include "shuffle.h"
 #include "engine.h"
+#include "scoring.h"
 
 
 static WINDOW *root_window;
@@ -11,6 +12,7 @@ static WINDOW *playfield_window;
 static WINDOW *preview_window;
 static WINDOW *hold_window;
 static WINDOW *score_window;
+static WINDOW *debug_window;
 
 #define ANSI_BLACK   0
 #define ANSI_RED     1
@@ -151,9 +153,23 @@ void draw_hard_drop_preview(void)
 void draw_score(void)
 { //{{{
     wclear(score_window);
+    wattron(score_window, A_UNDERLINE);
     mvwaddstr(score_window, 0, 0, "LEVEL");
-    mvwprintw(score_window, 1, 2, "% 2d", engine_get_level()+1);
+    mvwaddstr(score_window, 0, 8, "SCORE");
+    mvwaddstr(score_window, 0, 17, "LINES");
+    wattroff(score_window, A_UNDERLINE);
+    mvwprintw(score_window, 1, 0,
+              " % 3d   %07d      %d",
+              scoring_get_level()+1, scoring_get_score(), scoring_get_cleared_lines());
     wrefresh(score_window);
+/*}}}*/ }
+
+
+void draw_debug(const char* msg)
+{ //{{{
+    wclear(debug_window);
+    mvwaddstr(debug_window, 0, 0, msg);
+    wrefresh(debug_window);
 /*}}}*/ }
 
 
@@ -210,7 +226,8 @@ void graphics_init(void)
     playfield_window = derwin(root_window, PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH, 1, 1);
     preview_window = newwin(TETROMINO_QUEUE_PREVIEW_HEIGHT+1,6,Y_offset,X_offset+PLAYFIELD_WIDTH+2);
     hold_window = newwin(5, 6, Y_offset, X_offset-(PLAYFIELD_WIDTH/2)-1);
-    score_window = newwin(10, 6, Y_offset+6, X_offset-(PLAYFIELD_WIDTH/2)-1);
+    score_window = newwin(2, PLAYFIELD_WIDTH*2+3, Y_offset-2, X_offset-(PLAYFIELD_WIDTH/2));
+    debug_window = newwin(10, 6, Y_offset+6, X_offset-(PLAYFIELD_WIDTH/2)-1);
 
     /* Must refresh root window before drawing to subwindows */
     refresh();

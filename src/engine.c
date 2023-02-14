@@ -1,10 +1,14 @@
 #include <time.h>
 #include <pthread.h>
 #include <unistd.h>  // usleep
+#include <stdlib.h>
+#include <signal.h>
+
 #include "engine.h"
 #include "playfield.h"
 #include "shuffle.h"
 #include "graphics.h"
+#include "scoring.h"
 
 
 /* Wallkick values for the Super Rotation System
@@ -24,15 +28,18 @@ static uint8_t X, Y;
 static int8_t Y_hard_drop = -1;
 static tetromino_type_t held_tetromino = TETROMINO_TYPE_NULL;
 static bool tetromino_swapped = false;
-static uint8_t cleared_lines = 0;
-static uint8_t level = 0;
-static uint32_t fall_delay = ENGINE_GRAVITY_INITIAL_DELAY_us;
+
+static uint32_t fall_delay = (ENGINE_GRAVITY_INITIAL_DELAY_us 
+                      - ((int32_t)ENGINE_GRAVITY_INITIAL_DELAY_us*14/SCORING_MAX_LEVEL));
 static bool game_loop = true;
 static bool prevent_drop_lock = false;
 
 static pthread_mutex_t mutex;
 static pthread_t engine_gravity_thread;
 static pthread_t engine_drop_lock_thread;
+
+
+static void engine_advance_tetromino();
 
 
 void engine_input_loop(void)
@@ -47,10 +54,8 @@ void engine_input_loop(void)
         switch(input) {
             case KEY_LEFT:  engine_move_active_tetromino(-1,0); break;
             case KEY_RIGHT: engine_move_active_tetromino(1,0);  break;
-            case KEY_DOWN:  engine_move_active_tetromino(0,1);  break;
-            case KEY_UP:
-                engine_place_tetromino_at_xy(X, Y_hard_drop);
-                break;
+            case KEY_DOWN:  engine_soft_drop_tetromino(); break;
+            case KEY_UP:    engine_hard_drop_tetromino(); break;
             case 's': engine_rotate_active_tetromino_counterclockwise();  break;
             case 'd': engine_rotate_active_tetromino_clockwise();  break;
             case 'r': engine_swap_hold(); break;
@@ -65,37 +70,41 @@ void engine_input_loop(void)
 /*}}}*/ }
 
 
+static void *engine_drop_lock_thread_task(void*)
+{ //{{{
+    usleep(ENGINE_DROP_LOCK_DELAY_us);
+    if (!prevent_drop_lock) {
+        pthread_mutex_lock(&mutex);
+        engine_place_tetromino_at_xy(X,Y);
+        draw_game();
+        prevent_drop_lock = true;
+        pthread_mutex_unlock(&mutex);
+    }
+    else {
+        prevent_drop_lock = false;
+    }
+    pthread_exit(NULL);
+/*}}}*/ }
+
+
 static void *engine_gravity_thread_task(void*)
 { //{{{
     while(game_loop) {
         usleep(fall_delay);
+
         pthread_mutex_lock(&mutex);
-        engine_move_active_tetromino(0, 1);
-        draw_game();
+
+        char body[60];
+        sprintf(body, "%d %d", fall_delay, rand()%1024);
+        draw_debug(body);
+
+        engine_advance_tetromino();
+
         pthread_mutex_unlock(&mutex);
     };
-    return NULL;
+
+    pthread_exit(NULL);
 /*}}}*/ }
-
-
-static void *engine_drop_lock_thread_task(void*)
-{ //{{{
-    while(game_loop) {
-        usleep(ENGINE_DROP_LOCK_DELAY_us);
-        pthread_mutex_lock(&mutex);
-        if (!playfield_validate_tetromino_placement(&tetromino, X, Y+1)) {
-            if (!prevent_drop_lock) {
-                prevent_drop_lock = true;
-                engine_place_tetromino_at_xy(X,Y);
-                draw_game();
-            }
-            else prevent_drop_lock = false;
-        }
-        pthread_mutex_unlock(&mutex);
-    }
-    return NULL;
-/*}}}*/ }
-
 
 
 void engine_init()
@@ -105,7 +114,6 @@ void engine_init()
     tetromino = (tetromino_t){ (tetromino_type_t)(bag_of_7_pop_sample()+1), 0 };
     pthread_mutex_init(&mutex, NULL);
     pthread_create(&engine_gravity_thread, NULL, &engine_gravity_thread_task, NULL);
-    pthread_create(&engine_drop_lock_thread, NULL, &engine_drop_lock_thread_task, NULL);
     game_loop = 1;
 /*}}}*/ }
 
@@ -113,12 +121,16 @@ void engine_init()
 void engine_clean()
 { //{{{
     game_loop = 0;
+
+    if (pthread_kill(&engine_drop_lock_thread, 0) == 0) {
+        pthread_cancel(engine_drop_lock_thread);
+        pthread_join(engine_drop_lock_thread, NULL);
+    }
+
     pthread_cancel(engine_gravity_thread);
-    pthread_cancel(engine_drop_lock_thread);
     pthread_mutex_unlock(&mutex);
     pthread_mutex_destroy(&mutex);
     pthread_join(engine_gravity_thread, NULL);
-    pthread_join(engine_drop_lock_thread, NULL);
 /*}}}*/ }
 
 
@@ -126,9 +138,6 @@ const tetromino_t* engine_get_active_tetromino() { return &tetromino; }
 
 
 const tetromino_type_t engine_get_held_tetromino() { return held_tetromino; }
-
-
-const uint8_t engine_get_level() { return level; }
 
 
 const point_t engine_get_active_xy() { return (const point_t){X, Y}; }
@@ -166,6 +175,39 @@ bool engine_move_active_tetromino(int8_t dx, uint8_t dy)
 /*}}}*/ }
 
 
+void engine_advance_tetromino()
+{ //{{{
+    if (engine_move_active_tetromino(0,1)) {
+        prevent_drop_lock = true;
+        draw_game();
+    }
+    else {
+        // if (pthread_kill(engine_drop_lock_thread, 0) == 0) {
+        //     pthread_cancel(engine_drop_lock_thread);
+        //     pthread_join(engine_drop_lock_thread, NULL);
+        // }
+        pthread_create(&engine_drop_lock_thread, NULL, &engine_drop_lock_thread_task, NULL);
+    }
+/*}}}*/ }
+
+
+void engine_hard_drop_tetromino()
+{ //{{{
+    if (Y_hard_drop > -1) {
+        uint8_t drop_height = Y_hard_drop - Y;
+        scoring_add_hard_drop(drop_height);
+        engine_place_tetromino_at_xy(X, Y_hard_drop);
+    }
+/*}}}*/ }
+
+
+void engine_soft_drop_tetromino()
+{ //{{{
+    engine_advance_tetromino();
+    scoring_add_soft_drop();
+/*}}}*/ }
+
+
 void engine_swap_hold(void)
 { //{{{
     if (!tetromino_swapped) {
@@ -187,25 +229,25 @@ void engine_swap_hold(void)
 
 void engine_place_tetromino_at_xy(uint8_t x, uint8_t y)
 { //{{{
+    if (pthread_kill(&engine_drop_lock_thread, 0) == 0) {
+        pthread_cancel(engine_drop_lock_thread);
+        pthread_join(engine_drop_lock_thread, NULL);
+    }
+
     playfield_place_tetromino(&tetromino, x, y);
     draw_playfield();
     tetromino_swapped = false;
     tetromino = (tetromino_t){ (tetromino_type_t)(bag_of_7_pop_sample()+1), 0 };
+    uint8_t lines = playfield_clear_lines(animate_line_kill);
+    uint8_t new_level = scoring_add_line_clears(lines);
+    if (new_level) {
+        fall_delay = (ENGINE_GRAVITY_INITIAL_DELAY_us 
+                      - ((int32_t)ENGINE_GRAVITY_INITIAL_DELAY_us*new_level/SCORING_MAX_LEVEL));
+    }
     X = PLAYFIELD_SPAWN_X;
     Y = PLAYFIELD_SPAWN_Y;
-    uint8_t lines = playfield_clear_lines(animate_line_kill);
-    if (lines) {
-        cleared_lines += lines;
-        if (cleared_lines >= ENGINE_LINES_PER_LEVEL) {
-            cleared_lines %= ENGINE_LINES_PER_LEVEL;
-            if (level < ENGINE_MAX_LEVEL) {
-                level++;
-                fall_delay = (ENGINE_GRAVITY_INITIAL_DELAY_us 
-                              - ((int32_t)ENGINE_GRAVITY_INITIAL_DELAY_us*level/11));
-            }
-        }
-    }
-    draw_score();
+    pthread_cancel(engine_gravity_thread);
+    pthread_create(&engine_gravity_thread, NULL, &engine_gravity_thread_task, NULL);
     draw_queue_preview();
 /*}}}*/}
 
