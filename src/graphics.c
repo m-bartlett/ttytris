@@ -1,4 +1,3 @@
-#include <sys/ioctl.h>  // ioctl winsize
 #include <unistd.h>     // STDOUTFILENO, usleep
 #include "graphics.h"
 #include "playfield.h"
@@ -165,10 +164,18 @@ void draw_score(void)
 /*}}}*/ }
 
 
-void draw_debug(const char* msg)
+void draw_debug(const char* format, ...)
 { //{{{
+    va_list args;
+    va_start(args, format);
+
+    char body[100];
+    vsprintf(body, format, args);
+    va_end(args);
+
     wclear(debug_window);
-    mvwaddstr(debug_window, 0, 0, msg);
+    // mvwprintw(debug_window, 0, 0, "% 60s", "");
+    mvwaddstr(debug_window, 0, 0, body);
     wrefresh(debug_window);
 /*}}}*/ }
 
@@ -195,12 +202,6 @@ void animate_line_kill(uint8_t Y)
 
 void graphics_init(void)
 { //{{{
-    /* Get current terminal dimensions */
-    // TODO: Handle SIGWINCH and readjust accordingly
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    const uint8_t X_offset = (w.ws_col>>1) - (PLAYFIELD_WIDTH/2),
-                  Y_offset = (w.ws_row>>1) - (PLAYFIELD_HEIGHT/2);
 
     /* Initialize ncurses in alternate scrollback */
     initscr(); /* start curses mode */
@@ -208,6 +209,13 @@ void graphics_init(void)
     noecho();  /* don't print input characters */
     curs_set(0);
     keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE); // Turn on non-blocking mode
+
+    // TODO: Handle SIGWINCH and readjust accordingly
+    uint16_t height, width;
+    getmaxyx(stdscr, height, width);
+    const uint8_t X_offset = (width>>1) - (PLAYFIELD_WIDTH/2),
+                  Y_offset = (height>>1) - (PLAYFIELD_HEIGHT/2);
 
 
     /* Initialize ncurses colors */
@@ -236,7 +244,9 @@ void graphics_init(void)
     draw_queue_preview();
     draw_held_tetromino();
     draw_score();
+    draw_debug("");
     wrefresh(playfield_window);
+
 /*}}}*/ }
 
 

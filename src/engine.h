@@ -5,8 +5,10 @@
 #include <stdbool.h>
 #include "tetromino.h"
 
-#define ENGINE_DROP_LOCK_DELAY_us 600000
-#define ENGINE_GRAVITY_INITIAL_DELAY_us 750000
+#define ENGINE_DROP_LOCK_DELAY_MICROSECONDS 500000
+#define ENGINE_GRAVITY_INITIAL_DELAY_MICROSECONDS 700000
+#define ENGINE_FRAMES_PER_SECOND 30
+#define ENGINE_MICROSECONDS_PER_FRAME (1000000/ENGINE_FRAMES_PER_SECOND)
 
 typedef struct { const uint8_t x; const uint8_t y; } point_t;
 

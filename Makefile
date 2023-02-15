@@ -5,6 +5,7 @@ TARGET := ttytris
 LIBS   := ncurses
 CC     := gcc
 
+# CFLAGS := --std=c99 -D_POSIX_C_SOURCE=199309L
 CFLAGS := 
 
 ifdef PKG_LIBS
