@@ -33,8 +33,7 @@ static int8_t Y_hard_drop = -1;
 static tetromino_type_t held_tetromino = TETROMINO_TYPE_NULL;
 static bool tetromino_swapped = false;
 
-static uint32_t gravity_delay = 50000;
-// static uint32_t gravity_delay = ENGINE_GRAVITY_INITIAL_DELAY_MICROSECONDS;
+static uint32_t gravity_delay = ENGINE_GRAVITY_INITIAL_DELAY_MICROSECONDS;
 static timespec_t drop_lock_timer = {0};
 static timespec_t gravity_timer;
 
@@ -87,7 +86,7 @@ void engine_input_loop(void)
         if (!timer_is_null(&drop_lock_timer)) {
             uint32_t lock_countdown = timer_get_elapsed_microseconds(&drop_lock_timer, &end_time);
             lock_countdown = ENGINE_DROP_LOCK_DELAY_MICROSECONDS - lock_countdown;
-            draw_debug("%d", lock_countdown);
+            draw_debug("%d", lock_countdown/10000);
         }
     };
 /*}}}*/ }
@@ -251,8 +250,8 @@ void engine_rotate_active_tetromino_clockwise()  // Rotation with wallkicks
     const int8_t (*wallkicks)[2];
 
     switch(tetromino.type) {
-        case TETROMINO_TYPE_O:  // O-piece cannot rotate, does not reset timer
-            goto invalid_exit;
+        case TETROMINO_TYPE_O:  // O-piece cannot rotate, nothing to be done
+            goto valid_exit;
         case TETROMINO_TYPE_I:
             wallkicks = WALLKICKS_I[tetromino.rotation]; break;
         default:
@@ -290,8 +289,8 @@ void engine_rotate_active_tetromino_counterclockwise()  // Rotation with wallkic
     const int8_t (*wallkicks)[2];
 
     switch(tetromino.type) {
-        case TETROMINO_TYPE_O:  // O-piece cannot rotate, does not reset timer
-            goto invalid_exit;
+        case TETROMINO_TYPE_O:  // O-piece cannot rotate, nothing to be done
+            goto valid_exit;
         case TETROMINO_TYPE_I:
             wallkicks = WALLKICKS_I[tetromino.rotation]; break;
         default:

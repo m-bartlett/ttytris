@@ -1,9 +1,9 @@
 #include "graphics.h"
 #include "scoring.h"
 
-static uint8_t cleared_lines = 11;
+static uint8_t cleared_lines = 0;
 static uint8_t total_cleared_lines = 0;
-static uint8_t level = 13;
+static uint8_t level = 0;
 static uint32_t score = 0;
 
 static const uint16_t SIMULTANEOUS_LINE_CLEAR_SCORES[] = { 100, 300, 500, 800 };
