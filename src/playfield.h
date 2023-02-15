@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "tetromino.h"
 
 #define PLAYFIELD_WIDTH 10
@@ -22,6 +23,7 @@ void playfield_place_tetromino(tetromino_t* t, uint8_t X, uint8_t Y);
 bool playfield_validate_tetromino_placement(tetromino_t* t, uint8_t X, uint8_t Y);
 void playfield_clear_line(uint8_t Y);
 uint8_t playfield_clear_lines(void (*callback)(uint8_t));
+void playfield_set(const char* cells, const size_t size, const size_t offset);
 
 
 #endif

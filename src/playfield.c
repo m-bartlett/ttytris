@@ -1,4 +1,5 @@
 #include <stddef.h>  // NULL
+#include <string.h>  // strlen
 #include "playfield.h"
 
 const uint8_t PLAYFIELD_WIDTH_1 = PLAYFIELD_WIDTH - 1, PLAYFIELD_HEIGHT_1 = PLAYFIELD_HEIGHT - 1,
@@ -94,10 +95,19 @@ uint8_t playfield_clear_lines(void (*callback)(uint8_t))
             row_occupied = row_occupied && PLAYFIELD[y][x];
         }
         if (row_occupied) {
-            if (callback != NULL) callback(y);
             playfield_clear_line(y);
+            if (callback != NULL) callback(y);
             ++lines;
         }
     }
     return lines;
+/*}}}*/ }
+
+void playfield_set(const char* cells, const size_t size, const size_t offset)
+{ //{{{
+    if (offset+size > PLAYFIELD_HEIGHT*PLAYFIELD_WIDTH) return;
+    for (uint16_t i_p = offset, i_c=0; i_c < size; ++i_c, ++i_p) {
+        uint8_t x = i_p % PLAYFIELD_WIDTH, y = i_p / PLAYFIELD_WIDTH;
+        PLAYFIELD[y][x] = cells[i_c];
+    }
 /*}}}*/ }

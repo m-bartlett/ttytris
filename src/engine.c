@@ -38,17 +38,15 @@ static timespec_t drop_lock_timer = {0};
 static timespec_t gravity_timer;
 
 
-
 static void engine_check_drop_lock();
 static void engine_update_gravity();
 
 
-void engine_input_loop(void)
+void engine_game_loop(void)
 { //{{{
     int input=0;
     uint32_t elapsed_us=0;
     int32_t remaining_us=0;
-    // clock_t loop_timer;
     uint32_t loop_timer;
     timespec_t start_time, end_time;
 
@@ -68,7 +66,10 @@ void engine_input_loop(void)
             case 's': engine_rotate_active_tetromino_counterclockwise();  break;
             case 'd': engine_rotate_active_tetromino_clockwise();  break;
             case 'r': engine_swap_hold(); break;
-            case 'q': return;
+            case 'q':
+                nodelay(stdscr, FALSE);
+                animate_game_over();
+                getch();
             default:;
         }
 
@@ -83,11 +84,11 @@ void engine_input_loop(void)
         if (remaining_us > 0) usleep(remaining_us);
 
         // draw_debug("%d\n%d", elapsed_us, remaining_us);
-        if (!timer_is_null(&drop_lock_timer)) {
+        /*if (!timer_is_null(&drop_lock_timer)) {
             uint32_t lock_countdown = timer_get_elapsed_microseconds(&drop_lock_timer, &end_time);
             lock_countdown = ENGINE_DROP_LOCK_DELAY_MICROSECONDS - lock_countdown;
-            draw_debug("%d", lock_countdown/10000);
-        }
+            draw_debug("%d", lock_countdown/100000);
+        }*/
     };
 /*}}}*/ }
 
@@ -274,7 +275,7 @@ void engine_rotate_active_tetromino_clockwise()  // Rotation with wallkicks
         return;
 
     invalid_exit:
-        tetromino_rotate_clockwise(&tetromino); // undo rotation if no kicks are valid
+        tetromino_rotate_counterclockwise(&tetromino); // undo rotation if no kicks are valid
         return;
 /*}}}*/ }
 

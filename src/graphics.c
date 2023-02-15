@@ -28,8 +28,44 @@ static WINDOW *debug_window;
 #define TETROMINO_QUEUE_PREVIEW_HEIGHT (TETROMINO_QUEUE_PREVIEW_QUANTITY*3)
 
 
-static const uint8_t TETROMINO_ANSI_COLORS[] = {ANSI_BLACK, ANSI_WHITE, ANSI_YELLOW, ANSI_MAGENTA,
-                                                ANSI_BLUE, ANSI_CYAN, ANSI_GREEN, ANSI_RED};
+static const uint8_t GAME_OVER_PLAYFIELD[] = {
+    TETROMINO_TYPE_Z,TETROMINO_TYPE_Z,TETROMINO_TYPE_Z,0,0,0,0,0,0,0,
+    TETROMINO_TYPE_Z,0,0,0,0,0,0,0,0,0,
+    TETROMINO_TYPE_Z,0,TETROMINO_TYPE_Z,0,0,0,0,0,0,0,
+    TETROMINO_TYPE_Z,TETROMINO_TYPE_Z,TETROMINO_TYPE_Z,TETROMINO_TYPE_I,0,0,0,0,0,0,
+    0,0,TETROMINO_TYPE_I,0,TETROMINO_TYPE_I,0,0,0,0,0,
+    0,0,TETROMINO_TYPE_I,TETROMINO_TYPE_I,TETROMINO_TYPE_I,0,0,0,0,0,
+    0,0,TETROMINO_TYPE_I,0,TETROMINO_TYPE_I,TETROMINO_TYPE_L,0,TETROMINO_TYPE_L,0,0,
+    0,0,0,0,TETROMINO_TYPE_L,0,TETROMINO_TYPE_L,0,TETROMINO_TYPE_L,0,
+    TETROMINO_TYPE_T,TETROMINO_TYPE_T,TETROMINO_TYPE_T,0,TETROMINO_TYPE_L,
+            0,TETROMINO_TYPE_L,0,TETROMINO_TYPE_J,TETROMINO_TYPE_J,
+    TETROMINO_TYPE_T,0,TETROMINO_TYPE_T,0,0,0,0,0,TETROMINO_TYPE_J,TETROMINO_TYPE_J,
+    TETROMINO_TYPE_T,0,TETROMINO_TYPE_T,0,0,0,0,0,TETROMINO_TYPE_J,0,
+    TETROMINO_TYPE_T,TETROMINO_TYPE_T,TETROMINO_TYPE_S,0,TETROMINO_TYPE_S,
+            0,0,0,TETROMINO_TYPE_J,TETROMINO_TYPE_J,
+    0,0,TETROMINO_TYPE_S,0,TETROMINO_TYPE_S,0,0,0,0,0,
+    0,0,TETROMINO_TYPE_S,0,TETROMINO_TYPE_S,TETROMINO_TYPE_J,TETROMINO_TYPE_J,0,0,0,
+    0,0,0,TETROMINO_TYPE_S,0,TETROMINO_TYPE_J,TETROMINO_TYPE_J,0,0,0,
+    0,0,0,0,0,TETROMINO_TYPE_J,0,TETROMINO_TYPE_O,TETROMINO_TYPE_O,TETROMINO_TYPE_O,
+    0,0,0,0,0,TETROMINO_TYPE_J,TETROMINO_TYPE_J,TETROMINO_TYPE_O,0,TETROMINO_TYPE_O,
+    0,0,0,0,0,0,0,TETROMINO_TYPE_O,TETROMINO_TYPE_O,0,
+    0,0,0,0,0,0,0,TETROMINO_TYPE_O,0,TETROMINO_TYPE_O
+};
+// static const size_t GAME_OVER_PLAYFIELD_SIZE = 190;
+static const size_t GAME_OVER_PLAYFIELD_SIZE = (sizeof(GAME_OVER_PLAYFIELD)
+                                                    / sizeof(GAME_OVER_PLAYFIELD[0]));
+
+static const uint8_t TETROMINO_ANSI_COLORS[] = {
+    [TETROMINO_TYPE_NULL] = ANSI_BLACK,
+    [TETROMINO_TYPE_I]    = ANSI_WHITE,
+    [TETROMINO_TYPE_O]    = ANSI_YELLOW,
+    [TETROMINO_TYPE_T]    = ANSI_MAGENTA,
+    [TETROMINO_TYPE_J]    = ANSI_BLUE,
+    [TETROMINO_TYPE_L]    = ANSI_CYAN,
+    [TETROMINO_TYPE_S]    = ANSI_GREEN,
+    [TETROMINO_TYPE_Z]    = ANSI_RED
+};
+
 
 void draw_tetromino_at_xy(WINDOW *w,
                           const tetromino_t *t,
@@ -144,7 +180,7 @@ void draw_hard_drop_preview(void)
     if (Y_harddrop > -1) {
         const point_t p = engine_get_active_xy();
         const tetromino_t* tetromino = engine_get_active_tetromino();
-        draw_tetromino_at_xy(playfield_window, tetromino, p.x, Y_harddrop, '.');
+        draw_tetromino_at_xy(playfield_window, tetromino, p.x, Y_harddrop, '*');
     }
 /*}}}*/ }
 
@@ -196,6 +232,22 @@ void animate_line_kill(uint8_t Y)
         mvwaddch(playfield_window, Y, x, symbol);
         usleep(FRAME_DELAY_us);
         wrefresh(playfield_window);
+    }
+    draw_playfield();
+/*}}}*/ }
+
+
+void animate_game_over()
+{ //{{{
+    const uint8_t game_over_lines = GAME_OVER_PLAYFIELD_SIZE / PLAYFIELD_WIDTH;
+    for (uint8_t i = 0; i < game_over_lines; ++i) {
+        playfield_clear_line(PLAYFIELD_HEIGHT);
+        playfield_set(&(GAME_OVER_PLAYFIELD[(game_over_lines-i-1) * PLAYFIELD_WIDTH]),
+                      PLAYFIELD_WIDTH,
+                      0);
+        draw_playfield();
+        wrefresh(playfield_window);
+        usleep(FRAME_DELAY_us*5);
     }
 /*}}}*/ }
 

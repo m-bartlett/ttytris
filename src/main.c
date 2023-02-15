@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     graphics_init();
     draw_game();
     
-    engine_input_loop();
+    engine_game_loop();
 
     graphics_clean();
     engine_clean();
