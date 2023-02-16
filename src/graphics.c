@@ -51,7 +51,7 @@ static const uint8_t GAME_OVER_PLAYFIELD[] = {
     0,0,0,0,0,0,0,TETROMINO_TYPE_O,TETROMINO_TYPE_O,0,
     0,0,0,0,0,0,0,TETROMINO_TYPE_O,0,TETROMINO_TYPE_O
 };
-// static const size_t GAME_OVER_PLAYFIELD_SIZE = 190;
+
 static const size_t GAME_OVER_PLAYFIELD_SIZE = (sizeof(GAME_OVER_PLAYFIELD)
                                                     / sizeof(GAME_OVER_PLAYFIELD[0]));
 
@@ -240,6 +240,7 @@ void animate_line_kill(uint8_t Y)
 void animate_game_over()
 { //{{{
     const uint8_t game_over_lines = GAME_OVER_PLAYFIELD_SIZE / PLAYFIELD_WIDTH;
+    playfield_clear_line(PLAYFIELD_HEIGHT);
     for (uint8_t i = 0; i < game_over_lines; ++i) {
         playfield_clear_line(PLAYFIELD_HEIGHT);
         playfield_set(&(GAME_OVER_PLAYFIELD[(game_over_lines-i-1) * PLAYFIELD_WIDTH]),
