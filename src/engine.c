@@ -32,6 +32,7 @@ static uint8_t X, Y;
 static int8_t Y_hard_drop = -1;
 static tetromino_type_t held_tetromino = TETROMINO_TYPE_NULL;
 static bool tetromino_swapped = false;
+static engine_state_t engine_state = ENGINE_STATE_UNINITIALIZED;
 
 static uint32_t gravity_delay = ENGINE_GRAVITY_INITIAL_DELAY_MICROSECONDS;
 static timespec_t drop_lock_timer = {0};
@@ -40,6 +41,7 @@ static timespec_t gravity_timer;
 
 static void engine_check_drop_lock();
 static void engine_update_gravity();
+static void engine_flush_input();
 
 
 void engine_game_loop(void)
@@ -50,7 +52,7 @@ void engine_game_loop(void)
     uint32_t loop_timer;
     timespec_t start_time, end_time;
 
-    while(1) {
+    while(engine_state == ENGINE_STATE_RUNNING) {
         elapsed_us=0;
         remaining_us=0;
 
@@ -89,7 +91,18 @@ void engine_game_loop(void)
             lock_countdown = ENGINE_DROP_LOCK_DELAY_MICROSECONDS - lock_countdown;
             draw_debug("%d", lock_countdown/100000);
         }*/
-    };
+    }
+
+    switch(engine_state) {
+        case ENGINE_STATE_LOSE:
+            animate_game_over();
+            engine_flush_input();
+            nodelay(stdscr, FALSE);  // input is blocking
+            getch();                 //  await any input
+            return;
+        case ENGINE_STATE_WIN:
+        default:
+    }
 
 /*}}}*/ }
 
@@ -128,6 +141,15 @@ static void engine_update_gravity()
 /*}}}*/ }
 
 
+static void engine_flush_input()
+{ //{{{
+    int input;
+    do {
+        input = wgetch(stdscr);
+    } while (input != ERR);
+/*}}}*/ }
+
+
 tetromino_type_t engine_pop_queued_tetromino()
 { //{{{
     const tetromino_type_t type = (tetromino_type_t)(bag_of_7_pop_sample()+1);
@@ -141,8 +163,8 @@ void engine_spawn_tetromino(tetromino_type_t type)
     tetromino = (tetromino_t){ type, 0 };
     X = PLAYFIELD_SPAWN_X;
     Y = PLAYFIELD_SPAWN_Y;
-    if (!playfield_validate_tetromino_placement(&tetromino, PLAYFIELD_SPAWN_X, PLAYFIELD_SPAWN_Y)) {
-        0+0;
+    if (!playfield_validate_tetromino_placement(&tetromino, X, Y)) {
+        engine_state = ENGINE_STATE_LOSE;  // Game is over if there's no room for a new piece.
     }
 /*}}}*/}
 
@@ -152,6 +174,7 @@ void engine_init()
     bag_of_7_init(time(NULL));
     engine_spawn_tetromino(engine_pop_queued_tetromino());
     timer_set_current_time(&gravity_timer);
+    engine_state = ENGINE_STATE_RUNNING;
 /*}}}*/ }
 
 

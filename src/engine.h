@@ -10,6 +10,13 @@
 #define ENGINE_FRAMES_PER_SECOND 30
 #define ENGINE_MICROSECONDS_PER_FRAME (1000000/ENGINE_FRAMES_PER_SECOND)
 
+enum engine_state_enum { ENGINE_STATE_UNINITIALIZED=0,
+                          ENGINE_STATE_RUNNING,
+                          ENGINE_STATE_LOSE,
+                          ENGINE_STATE_WIN,
+                          ENGINE_STATE_QUANTITY };
+
+typedef enum engine_state_enum engine_state_t;
 typedef struct { const uint8_t x; const uint8_t y; } point_t;
 
 
