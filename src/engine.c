@@ -90,6 +90,7 @@ void engine_game_loop(void)
             draw_debug("%d", lock_countdown/100000);
         }*/
     };
+
 /*}}}*/ }
 
 
@@ -127,11 +128,29 @@ static void engine_update_gravity()
 /*}}}*/ }
 
 
+tetromino_type_t engine_pop_queued_tetromino()
+{ //{{{
+    const tetromino_type_t type = (tetromino_type_t)(bag_of_7_pop_sample()+1);
+    draw_queue_preview();
+    return type;
+/*}}}*/}
+
+
+void engine_spawn_tetromino(tetromino_type_t type)
+{ //{{{
+    tetromino = (tetromino_t){ type, 0 };
+    X = PLAYFIELD_SPAWN_X;
+    Y = PLAYFIELD_SPAWN_Y;
+    if (!playfield_validate_tetromino_placement(&tetromino, PLAYFIELD_SPAWN_X, PLAYFIELD_SPAWN_Y)) {
+        0+0;
+    }
+/*}}}*/}
+
+
 void engine_init()
 { //{{{
     bag_of_7_init(time(NULL));
-    X = PLAYFIELD_SPAWN_X, Y = PLAYFIELD_SPAWN_Y;
-    tetromino = (tetromino_t){ (tetromino_type_t)(bag_of_7_pop_sample()+1), 0 };
+    engine_spawn_tetromino(engine_pop_queued_tetromino());
     timer_set_current_time(&gravity_timer);
 /*}}}*/ }
 
@@ -142,13 +161,16 @@ void engine_clean()
 /*}}}*/ }
 
 
-const tetromino_t* engine_get_active_tetromino() { return &tetromino; }
+const tetromino_t* engine_get_active_tetromino()
+{ return &tetromino; }
 
 
-const tetromino_type_t engine_get_held_tetromino() { return held_tetromino; }
+const tetromino_type_t engine_get_held_tetromino()
+{ return held_tetromino; }
 
 
-const point_t engine_get_active_xy() { return (const point_t){X, Y}; }
+const point_t engine_get_active_xy()
+{ return (const point_t){X, Y}; }
 
 
 const int8_t engine_update_hard_drop_y()
@@ -209,15 +231,14 @@ void engine_swap_hold(void)
         tetromino_swapped = true;
         tetromino_type_t current = tetromino.type;
         if (held_tetromino == TETROMINO_TYPE_NULL) {
-            held_tetromino = bag_of_7_pop_sample()+1;
+            held_tetromino = engine_pop_queued_tetromino();
             draw_queue_preview();
         }
         tetromino.type = held_tetromino;
-        held_tetromino = current;
         tetromino.rotation = 0;
-        X = PLAYFIELD_SPAWN_X;
-        Y = PLAYFIELD_SPAWN_Y;
+        held_tetromino = current;
         draw_held_tetromino();
+        engine_spawn_tetromino(tetromino.type);
     }
 /*}}}*/ }
 
@@ -226,8 +247,6 @@ void engine_place_tetromino_at_xy(uint8_t x, uint8_t y)
 { //{{{
     playfield_place_tetromino(&tetromino, x, y);
     draw_playfield();
-    tetromino_swapped = false;
-    tetromino = (tetromino_t){ (tetromino_type_t)(bag_of_7_pop_sample()+1), 0 };
     uint8_t lines = playfield_clear_lines(animate_line_kill);
     uint8_t new_level = scoring_add_line_clears(lines);
     if (new_level) {
@@ -235,9 +254,8 @@ void engine_place_tetromino_at_xy(uint8_t x, uint8_t y)
                        - ((uint32_t)ENGINE_GRAVITY_INITIAL_DELAY_MICROSECONDS * new_level
                                                                        / SCORING_MAX_LEVEL));
     }
-    X = PLAYFIELD_SPAWN_X;
-    Y = PLAYFIELD_SPAWN_Y;
-    draw_queue_preview();
+    engine_spawn_tetromino(engine_pop_queued_tetromino());
+    tetromino_swapped = false;  // Reset swappability 
 /*}}}*/}
 
 
