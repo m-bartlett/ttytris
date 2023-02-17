@@ -164,7 +164,10 @@ void engine_spawn_tetromino(tetromino_type_t type)
     X = PLAYFIELD_SPAWN_X;
     Y = PLAYFIELD_SPAWN_Y;
     if (!playfield_validate_tetromino_placement(&tetromino, X, Y)) {
-        engine_state = ENGINE_STATE_LOSE;  // Game is over if there's no room for a new piece.
+        --Y;
+        if (!playfield_validate_tetromino_placement(&tetromino, X, Y)) {
+            engine_state = ENGINE_STATE_LOSE;  // Game is over if there's no room for a new piece.
+        }
     }
 /*}}}*/}
 
