@@ -243,8 +243,8 @@ void engine_hard_drop_tetromino()
 
 void engine_soft_drop_tetromino()
 { //{{{
-    if (!engine_move_active_tetromino(0,1)) {  // Pressing down against the ground locks the piece
-        engine_place_tetromino_at_xy(X,Y);
+    if (!engine_move_active_tetromino(0,1) && timer_is_null(&drop_lock_timer)) {
+        timer_set_current_time(&drop_lock_timer);
     }
     timer_set_current_time(&gravity_timer); // Reset gravity timer to prevent double-down
     scoring_add_soft_drop();
