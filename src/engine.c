@@ -279,6 +279,7 @@ void engine_place_tetromino_at_xy(uint8_t x, uint8_t y)
         gravity_delay = (ENGINE_GRAVITY_INITIAL_DELAY_MICROSECONDS 
                        - ((uint32_t)ENGINE_GRAVITY_INITIAL_DELAY_MICROSECONDS * new_level
                                                                        / SCORING_MAX_LEVEL));
+        if (new_level >= SCORING_MAX_LEVEL) engine_state = ENGINE_STATE_WIN;
     }
     engine_spawn_tetromino(engine_pop_queued_tetromino());
     tetromino_swapped = false;  // Reset swappability 
