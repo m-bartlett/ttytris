@@ -48,34 +48,34 @@ void test_empty_playfield_vacancy_top() { //{{{
 
     const uint16_t expected_4x4s[][7] = {
         [0] = {
-            [0] = (uint16_t)0b1111111111111110,
-            [1] = (uint16_t)0b1111111111111100,
-            [2] = (uint16_t)0b1111111111111000,
-            [3] = (uint16_t)0b1111111111110000,
+            [0] = (uint16_t)0b0000000000001110,
+            [1] = (uint16_t)0b0000000000001100,
+            [2] = (uint16_t)0b0000000000001000,
+            [3] = (uint16_t)0b0000000000000000,
             /*...*/
-            [4] = (uint16_t)0b1111111111110001,
-            [5] = (uint16_t)0b1111111111110011,
-            [6] = (uint16_t)0b1111111111110111
+            [4] = (uint16_t)0b0000000000000000,
+            [5] = (uint16_t)0b0000000000000001,
+            [6] = (uint16_t)0b0000000000000011
         },
         [1] = {
-            [0] = (uint16_t)0b1111111111101110,
-            [1] = (uint16_t)0b1111111111001100,
-            [2] = (uint16_t)0b1111111110001000,
-            [3] = (uint16_t)0b1111111100000000,
+            [0] = (uint16_t)0b0000000011101110,
+            [1] = (uint16_t)0b0000000011001100,
+            [2] = (uint16_t)0b0000000010001000,
+            [3] = (uint16_t)0b0000000000000000,
             /*...*/
-            [4] = (uint16_t)0b1111111100010001,
-            [5] = (uint16_t)0b1111111100110011,
-            [6] = (uint16_t)0b1111111101110111
+            [4] = (uint16_t)0b0000000000000000,
+            [5] = (uint16_t)0b0000000000010001,
+            [6] = (uint16_t)0b0000000000110011
         },
         [2] = {
-            [0] = (uint16_t)0b1111111011101110,
-            [1] = (uint16_t)0b1111110011001100,
-            [2] = (uint16_t)0b1111100010001000,
-            [3] = (uint16_t)0b1111000000000000,
+            [0] = (uint16_t)0b0000111011101110,
+            [1] = (uint16_t)0b0000110011001100,
+            [2] = (uint16_t)0b0000100010001000,
+            [3] = (uint16_t)0b0000000000000000,
             /*...*/
-            [4] = (uint16_t)0b1111000100010001,
-            [5] = (uint16_t)0b1111001100110011,
-            [6] = (uint16_t)0b1111011101110111
+            [4] = (uint16_t)0b0000000000000000,
+            [5] = (uint16_t)0b0000000100010001,
+            [6] = (uint16_t)0b0000001100110011
         },
         [3] = {
             [0] = (uint16_t)0b1110111011101110,
@@ -83,9 +83,9 @@ void test_empty_playfield_vacancy_top() { //{{{
             [2] = (uint16_t)0b1000100010001000,
             [3] = (uint16_t)0b0000000000000000,
             /*...*/
-            [4] = (uint16_t)0b0001000100010001,
-            [5] = (uint16_t)0b0011001100110011,
-            [6] = (uint16_t)0b0111011101110111
+            [4] = (uint16_t)0b0000000000000000,
+            [5] = (uint16_t)0b0001000100010001,
+            [6] = (uint16_t)0b0011001100110011
         },
     };
 
@@ -119,39 +119,39 @@ void test_empty_playfield_vacancy_bottom() { //{{{
             [2] = (uint16_t)0b1000100010001000,
             [3] = (uint16_t)0b0000000000000000,
             /*...*/
-            [4] = (uint16_t)0b0001000100010001,
-            [5] = (uint16_t)0b0011001100110011,
-            [6] = (uint16_t)0b0111011101110111
+            [4] = (uint16_t)0b0000000000000000,
+            [5] = (uint16_t)0b0001000100010001,
+            [6] = (uint16_t)0b0011001100110011
         },
         [1] = {
+            [0] = (uint16_t)0b1110111011101110,
+            [1] = (uint16_t)0b1100110011001100,
+            [2] = (uint16_t)0b1000100010001000,
+            [3] = (uint16_t)0b0000000000000000,
+            /*...*/
+            [4] = (uint16_t)0b0000000000000000,
+            [5] = (uint16_t)0b0001000100010001,
+            [6] = (uint16_t)0b0011001100110011
+        },
+        [2] = {
             [0] = (uint16_t)0b1110111011101111,
             [1] = (uint16_t)0b1100110011001111,
             [2] = (uint16_t)0b1000100010001111,
             [3] = (uint16_t)0b0000000000001111,
             /*...*/
-            [4] = (uint16_t)0b0001000100011111,
-            [5] = (uint16_t)0b0011001100111111,
-            [6] = (uint16_t)0b0111011101111111
+            [4] = (uint16_t)0b0000000000001111,
+            [5] = (uint16_t)0b0001000100011111,
+            [6] = (uint16_t)0b0011001100111111
         },
-        [2] = {
+        [3] = {
             [0] = (uint16_t)0b1110111011111111,
             [1] = (uint16_t)0b1100110011111111,
             [2] = (uint16_t)0b1000100011111111,
             [3] = (uint16_t)0b0000000011111111,
             /*...*/
-            [4] = (uint16_t)0b0001000111111111,
-            [5] = (uint16_t)0b0011001111111111,
-            [6] = (uint16_t)0b0111011111111111
-        },
-        [3] = {
-            [0] = (uint16_t)0b1110111111111111,
-            [1] = (uint16_t)0b1100111111111111,
-            [2] = (uint16_t)0b1000111111111111,
-            [3] = (uint16_t)0b0000111111111111,
-            /*...*/
-            [4] = (uint16_t)0b0001111111111111,
-            [5] = (uint16_t)0b0011111111111111,
-            [6] = (uint16_t)0b0111111111111111
+            [4] = (uint16_t)0b0000000011111111,
+            [5] = (uint16_t)0b0001000111111111,
+            [6] = (uint16_t)0b0011001111111111
         }
     };
 
@@ -182,7 +182,7 @@ void test_playfield_tetromino_placement() { /*{{{*/
     
     /* Basic tetromino placement and playfield block-type window tests {{{ */
 
-    tetromino_t z = {Z, 0};
+    tetromino_t z = {TETROMINO_TYPE_Z, 0};
 
     assert(playfield_validate_tetromino_placement(&z, 4, 4) == true,
            "placing Z piece on empty squares is valid");
@@ -256,7 +256,7 @@ void test_playfield_tetromino_placement() { /*{{{*/
                                               " ZZ "
                                               " Z  ");
     
-    tetromino_t l = {L, 0};
+    tetromino_t l = {TETROMINO_TYPE_L, 0};
 
     assert(playfield_validate_tetromino_placement(&l, 4, 4) == false,
            "placing L piece on top of Z piece is invalid");
@@ -282,7 +282,7 @@ void test_playfield_tetromino_placement() { /*{{{*/
     /* Test placement validity near playfield edges (literal edge-cases) {{{ */
 
 
-    tetromino_t j = {J, 2}; // ¬ shape to poke gradually out of bounds on the left
+    tetromino_t j = {TETROMINO_TYPE_J, 2}; // ¬ shape to poke gradually out of bounds on the left
 
     assert(playfield_validate_tetromino_placement(&j, 2, 12) == false,
            "placing piece slightly on top of left-side out-of-bounds is invalid");
@@ -357,8 +357,8 @@ void test_playfield_tetromino_placement() { /*{{{*/
                                                              "    "
                                                              "    ");
 
-    assert(playfield_validate_tetromino_placement(&j, PLAYFIELD_WIDTH, 12) == false,
-           "placing this piece's corner flush with the right-side out-of-bounds is invalid");
+    assert(playfield_validate_tetromino_placement(&j, PLAYFIELD_WIDTH, 12) == true,
+           "placing this piece's corner flush with the right-side out-of-bounds is valid");
     assert_playfield_grid_at_coordinate(PLAYFIELD_WIDTH, 12, "   #"
                                                              "   #"
                                                              "   #"
@@ -402,22 +402,22 @@ void test_playfield_tetromino_placement() { /*{{{*/
                                               "    "
                                               "    ");
 
-    assert(playfield_validate_tetromino_placement(&j, 9, 1) == false,
-           "placing piece slightly more on top of top-side out-of-bounds is invalid");
+    assert(playfield_validate_tetromino_placement(&j, 9, 1) == true,
+           "placing piece slightly more on top of top-side out-of-bounds is valid");
     assert_playfield_grid_at_coordinate(9, 1, "####"
                                               "####"
                                               "    "
                                               "    ");
 
-    assert(playfield_validate_tetromino_placement(&j, 9, 0) == false,
-           "placing piece mostly top-side out-of-bounds is still invalid");
+    assert(playfield_validate_tetromino_placement(&j, 9, 0) == true,
+           "placing piece mostly top-side out-of-bounds is still valid");
     assert_playfield_grid_at_coordinate(9, 0, "####"
                                               "####"
                                               "####"
                                               "    ");
 
-    assert(playfield_validate_tetromino_placement(&j, 9, -1) == false,
-           "placing piece completely top-side out-of-bounds is invalid");
+    assert(playfield_validate_tetromino_placement(&j, 9, -1) == true,
+           "placing piece completely top-side out-of-bounds is valid");
     assert_playfield_grid_at_coordinate(9, -1, "####"
                                                "####"
                                                "####"
