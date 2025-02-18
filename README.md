@@ -7,8 +7,8 @@ Tetris in your TTY<br/><br/>
 </p>
 
 
->**Note**
-><br/>For best visuals, you may want to configure your terminal to have a wide character width or otherwise use a font
+> [!NOTE]
+>For best visuals, you may want to configure your terminal to have a wide character width or otherwise use a font
 >with such, such that the character dimensions are nearly square.
 <br/>
 
